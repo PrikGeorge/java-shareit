@@ -1,103 +1,109 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.AccessDeniedException;
-import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.utils.IdentityGenerator;
+import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.item.mapper.ItemMapper.toItem;
+import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
 
 /**
  * @project java-shareit
  * @auther George Prikashchenkov on 19.02.2023
  */
-@Slf4j
 @Service
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository) {
         this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public List<Item> getAll() {
-        return itemRepository.getAll();
+    public List<ItemDto> getAll(Long userId) {
+        List<ItemDto> items = new ArrayList<>();
+        for (Item item : itemRepository.getAll()) {
+            if (item.getOwner().getId().equals(userId)) {
+                items.add(toItemDto(item));
+            }
+        }
+
+        return items;
+    }
+
+    @Override
+    public ItemDto getById(Long id) {
+        Item item = itemRepository.getById(id)
+                .orElseThrow(() -> new NotFoundException("Не найдена вещь с id: " + id));
+
+        return toItemDto(item);
     }
 
     @Override
     public ItemDto create(ItemDto itemDto, Long userId) {
-        Item item = ItemMapper.toEntity(itemDto);
-        item.setOwner(userId);
+        User user = userRepository.getById(userId)
+                .orElseThrow(() -> new NotFoundException("Невозможно создать вещь - " +
+                        "не найден пользователь с id: " + userId));
 
-        if (Objects.isNull(item.getId())) {
-            item.setId(IdentityGenerator.INSTANCE.generateId(Item.class));
-        }
+        Item item = toItem(itemDto);
+        item.setOwner(user);
+        itemRepository.create(item);
 
-        if (existsByNameAndOwner(item.getName(), item.getOwner())) {
-            throw new DuplicateEmailException("Item with name " + item.getName() + " already exists for owner " + item.getOwner());
-        }
-
-        Item savedItem = itemRepository.save(item);
-        return ItemMapper.toDTO(savedItem);
+        return toItemDto(item);
     }
 
     @Override
-    public ItemDto update(Long itemId, ItemDto itemDto, Long userId) {
-        Item existingItem = getById(itemId);
-
-        if (!existingItem.getOwner().equals(userId)) {
-            throw new AccessDeniedException("You are not the owner of this item");
+    public ItemDto update(ItemDto itemDto, Long id, Long userId) {
+        Item item = itemRepository.getById(id)
+                .orElseThrow(() -> new NotFoundException("Не найдена вещь с id: " + id));
+        if (!item.getOwner().getId().equals(userId)) {
+            throw new NotFoundException("Невозможно обновить вещь - у пользователя с id: " + userId + "нет такой вещи");
+        }
+        if (itemDto.getName() != null) {
+            item.setName(itemDto.getName());
+        }
+        if (itemDto.getDescription() != null) {
+            item.setDescription(itemDto.getDescription());
+        }
+        if (itemDto.getAvailable() != null) {
+            item.setAvailable(itemDto.getAvailable());
         }
 
-        existingItem.setName(Objects.requireNonNullElse(itemDto.getName(), existingItem.getName()));
-        existingItem.setDescription(Objects.requireNonNullElse(itemDto.getDescription(), existingItem.getDescription()));
-        existingItem.setAvailable(Objects.requireNonNullElse(itemDto.getAvailable(), existingItem.getAvailable()));
-
-        return ItemMapper.toDTO(itemRepository.save(existingItem));
+        return toItemDto(itemRepository.update(item));
     }
 
     @Override
-    public Item getById(Long id) {
-        Item item = itemRepository.findById(id);
-        if (Objects.isNull(item)) {
-            log.error("Item with id " + id + " not found");
-            throw new NotFoundException("Item with id " + id + " not found");
+    public void delete(Long id) {
+        getById(id);
+        itemRepository.delete(id);
+    }
+
+    @Override
+    public List<ItemDto> search(String text) {
+        List<ItemDto> searchedItems = new ArrayList<>();
+        if (text.isBlank()) {
+            return searchedItems;
+        }
+        for (Item item : itemRepository.getAll()) {
+            if (isSearched(text, item)) {
+                searchedItems.add(toItemDto(item));
+            }
         }
 
-        return item;
+        return searchedItems;
     }
 
-    @Override
-    public List<ItemDto> getItemsByUserId(Long userId) {
-        List<Item> items = itemRepository.findByOwner(userId);
-        return items.stream()
-                .map(ItemMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ItemDto> searchItems(String text) {
-        List<Item> items = itemRepository.searchItems(text);
-        return items.stream()
-                .filter(Item::getAvailable)
-                .map(ItemMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    private boolean existsByNameAndOwner(String name, Long ownerId) {
-        return getAll().stream()
-                .anyMatch(item -> item.getName().equals(name) && item.getOwner().equals(ownerId));
+    private Boolean isSearched(String text, Item item) {
+        return item.getName().toLowerCase().contains(text.toLowerCase()) ||
+                item.getDescription().toLowerCase().contains(text.toLowerCase()) && item.getAvailable();
     }
 }

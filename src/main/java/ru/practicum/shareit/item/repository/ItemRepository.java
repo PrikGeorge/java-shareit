@@ -11,8 +11,12 @@ import java.util.Optional;
  */
 public interface ItemRepository {
     List<Item> getAll();
-    Item save(Item item);
-    Item findById(Long itemId);
-    List<Item> findByOwner(Long ownerId);
-    List<Item> searchItems(String text);
+
+    Optional<Item> getById(Long id);
+
+    Item create(Item item);
+
+    Item update(Item item);
+
+    void delete(Long id);
 }

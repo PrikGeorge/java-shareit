@@ -1,50 +1,50 @@
 package ru.practicum.shareit.item.repository;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.utils.IdentityGenerator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * @project java-shareit
  * @auther George Prikashchenkov on 19.02.2023
  */
-@Repository
+@Component
 public class ItemRepositoryImpl implements ItemRepository {
-    private Map<Long, Item> itemMap = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
 
     @Override
     public List<Item> getAll() {
-        return new ArrayList<>(itemMap.values());
+        return new ArrayList<>(items.values());
     }
 
     @Override
-    public Item save(Item item) {
-        itemMap.put(item.getId(), item);
+    public Optional<Item> getById(Long id) {
+        return items.get(id) != null ? Optional.of(items.get(id)) : Optional.empty();
+    }
+
+    @Override
+    public Item create(Item item) {
+
+        if (Objects.isNull(item.getId())) {
+            item.setId(IdentityGenerator.INSTANCE.generateId(Item.class));
+        }
+
+        items.put(item.getId(), item);
+
         return item;
     }
 
     @Override
-    public Item findById(Long itemId) {
-        return itemMap.get(itemId);
+    public Item update(Item item) {
+        items.put(item.getId(), item);
+
+        return item;
     }
 
     @Override
-    public List<Item> findByOwner(Long ownerId) {
-        return itemMap.values().stream()
-                .filter(item -> item.getOwner().equals(ownerId))
-                .collect(Collectors.toList());
+    public void delete(Long id) {
+        items.remove(id);
     }
-
-    @Override
-    public List<Item> searchItems(String text) {
-        return itemMap.values().stream()
-                .filter(item -> item.getAvailable() && (item.getName().contains(text) || item.getDescription().contains(text)))
-                .collect(Collectors.toList());
-    }
-
 }

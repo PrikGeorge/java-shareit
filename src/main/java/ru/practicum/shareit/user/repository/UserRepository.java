@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.repository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @project java-shareit
@@ -11,9 +12,9 @@ import java.util.List;
 public interface UserRepository {
     List<User> getAll();
 
-    User findById(Long id);
+    Optional<User> getById(Long id);
 
     User save(User user);
 
-    void delete(User user);
+    void delete(Long id);
 }

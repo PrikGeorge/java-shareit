@@ -10,9 +10,6 @@ import ru.practicum.shareit.user.service.UserServiceImpl;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping(path = "/users")
 public class UserController {
@@ -35,19 +32,18 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDTO> create(@Valid @RequestBody UserDTO userDTO) {
-        UserDTO createdUserDTO = userServiceImpl.createUser(userDTO);
+        UserDTO createdUserDTO = userServiceImpl.create(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUserDTO);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        UserDTO updatedUserDTO = userServiceImpl.updateUser(id, userDTO);
+        UserDTO updatedUserDTO = userServiceImpl.update(id, userDTO);
         return ResponseEntity.ok(updatedUserDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userServiceImpl.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable Long id) {
+        userServiceImpl.delete(id);
     }
 }

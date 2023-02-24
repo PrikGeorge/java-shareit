@@ -8,7 +8,6 @@ import ru.practicum.shareit.user.dto.UserDTO;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepositoryImpl;
-import ru.practicum.shareit.utils.IdentityGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +28,8 @@ public class UserServiceImpl implements UserService {
     }
 
     public User getById(Long id) {
-        User user = userRepositoryImpl.findById(id);
-        if (Objects.isNull(user)) {
-            log.error("User with id " + id + " not found");
-            throw new NotFoundException("User with id " + id + " not found");
-        }
-        return user;
+        return userRepositoryImpl.getById(id)
+                .orElseThrow(() -> new NotFoundException("Не найден пользователь с id: " + id));
     }
 
     public List<UserDTO> getAll() {
@@ -52,19 +47,15 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    public UserDTO createUser(UserDTO userDTO) {
+    public UserDTO create(UserDTO userDTO) {
         User user = UserMapper.toEntity(userDTO);
         validateEmailUniqueness(user.getEmail());
-
-        if (Objects.isNull(user.getId())) {
-            user.setId(IdentityGenerator.INSTANCE.generateId(User.class));
-        }
 
         User createdUser = userRepositoryImpl.save(user);
         return UserMapper.toDTO(createdUser);
     }
 
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
+    public UserDTO update(Long id, UserDTO userDTO) {
         User user = getById(id);
 
         if (Objects.nonNull(userDTO.getEmail()) && !user.getEmail().equals(userDTO.getEmail())) {
@@ -77,17 +68,16 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toDTO(updatedUser);
     }
 
-    public void deleteUser(Long id) {
-        User user = getById(id);
-        userRepositoryImpl.delete(user);
+    public void delete(Long id) {
+        userRepositoryImpl.delete(id);
     }
 
     private void validateEmailUniqueness(String email) {
         List<User> users = userRepositoryImpl.getAll();
         for (User user : users) {
             if (email.equals(user.getEmail())) {
-                log.error("User with email " + email + " already exists");
-                throw new DuplicateEmailException("User with email " + email + " already exists");
+                log.error("Пользователь с такой почтой " + email + " уже существует");
+                throw new DuplicateEmailException("Пользователь с такой почтой " + email + " уже существует");
             }
         }
     }
