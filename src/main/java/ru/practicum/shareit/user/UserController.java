@@ -25,6 +25,7 @@ public class UserController {
         UserDTO userDTO = UserMapper.toDTO(userServiceImpl.getById(id));
         return ResponseEntity.ok(userDTO);
     }
+
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll() {
         return ResponseEntity.ok(userServiceImpl.getAll());
