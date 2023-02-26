@@ -66,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.getById(id)
                 .orElseThrow(() -> new NotFoundException("Не найдена вещь с id: " + id));
         if (!item.getOwner().getId().equals(userId)) {
-            throw new NotFoundException("Невозможно обновить вещь - у пользователя с id: " + userId + "нет такой вещи");
+            throw new NotFoundException("Невозможно обновить вещь - у пользователя с id: " + userId + " нет такой вещи");
         }
         if (itemDto.getName() != null) {
             item.setName(itemDto.getName());

@@ -1,7 +1,5 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDTO;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -21,26 +19,23 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getById(@PathVariable Long id) {
-        UserDTO userDTO = UserMapper.toDTO(userServiceImpl.getById(id));
-        return ResponseEntity.ok(userDTO);
+    public UserDTO getById(@PathVariable Long id) {
+        return UserMapper.toDTO(userServiceImpl.getById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAll() {
-        return ResponseEntity.ok(userServiceImpl.getAll());
+    public List<UserDTO> getAll() {
+        return userServiceImpl.getAll();
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserDTO userDTO) {
-        UserDTO createdUserDTO = userServiceImpl.create(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUserDTO);
+    public UserDTO create(@Valid @RequestBody UserDTO userDTO) {
+        return userServiceImpl.create(userDTO);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        UserDTO updatedUserDTO = userServiceImpl.update(id, userDTO);
-        return ResponseEntity.ok(updatedUserDTO);
+    public UserDTO update(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        return userServiceImpl.update(id, userDTO);
     }
 
     @DeleteMapping("/{id}")
