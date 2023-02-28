@@ -78,8 +78,8 @@ class ItemControllerTests {
         ItemDTO item = itemController.create(1L, itemDTO);
         UserDTO user2 = userController.create(userDTO.toBuilder().email("email2@mail.com").build());
         bookingController.create(BookingShortDto.builder()
-                .start(LocalDateTime.of(2022, 10, 20, 12, 15))
-                .end(LocalDateTime.of(2022, 10, 27, 12, 15))
+                .start(LocalDateTime.of(2023, 2, 20, 12, 15))
+                .end(LocalDateTime.of(2023, 2, 27, 12, 15))
                 .itemId(item.getId()).build(), user2.getId());
         bookingController.approve(1L, 1L, true);
         itemController.createComment(item.getId(), user2.getId(), comment);
