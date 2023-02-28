@@ -7,6 +7,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDTO;
 import ru.practicum.shareit.user.UserController;
@@ -81,8 +82,8 @@ class BookingControllerTests {
                 .start(LocalDateTime.of(2023, 2, 24, 12, 30))
                 .end(LocalDateTime.of(2023, 3, 10, 13, 0))
                 .itemId(item.getId()).build(), user1.getId());
-        assertEquals(1, bookingController.getAllByUser(user1.getId(), "WAITING").size());
+        assertEquals(1, bookingController.getAllByUser(user1.getId(), State.WAITING).size());
         bookingController.approve(booking.getId(), user.getId(), true);
-        assertEquals(1, bookingController.getAllByOwner(user.getId(), "CURRENT").size());
+        assertEquals(1, bookingController.getAllByOwner(user.getId(), State.CURRENT).size());
     }
 }

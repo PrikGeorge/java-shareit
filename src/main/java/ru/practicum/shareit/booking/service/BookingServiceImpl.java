@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.model.Item;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import static ru.practicum.shareit.booking.mapper.BookingMapper.toBooking;
 import static ru.practicum.shareit.booking.mapper.BookingMapper.toBookingDto;
 import static ru.practicum.shareit.booking.model.BookingStatus.*;
+import static ru.practicum.shareit.booking.model.State.UNSUPPORTED_STATUS;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -85,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
                     "бронирование уже подтверждено или отклонено");
         }
 
-        booking.setStatus(approved ? APPROVED : REJECTED);
+        booking.setStatus(Boolean.TRUE.equals(approved) ? APPROVED : REJECTED);
         bookingRepository.save(booking);
 
         return toBookingDto(booking);
@@ -93,34 +95,34 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllByOwner(Long userId, String state) {
+    public List<BookingDto> getAllByOwner(Long userId, State state) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Невозможно найти бронирования - " +
                         "не существует пользователя с id " + userId));
         List<Booking> bookingDtoList = new ArrayList<>();
         switch (state) {
-            case "ALL":
-                bookingDtoList.addAll(bookingRepository.findAllByItemOwner(user,sort));
+            case ALL:
+                bookingDtoList.addAll(bookingRepository.findAllByItemOwner(user, sort));
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookingDtoList.addAll(bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(user,
                         LocalDateTime.now(), LocalDateTime.now(), sort));
                 break;
-            case "PAST":
+            case PAST:
                 bookingDtoList.addAll(bookingRepository.findAllByItemOwnerAndEndBefore(user,
                         LocalDateTime.now(), sort));
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookingDtoList.addAll(bookingRepository.findAllByItemOwnerAndStartAfter(user, LocalDateTime.now(), sort));
                 break;
-            case "WAITING":
+            case WAITING:
                 bookingDtoList.addAll(bookingRepository.findAllByItemOwnerAndStatusEquals(user, WAITING, sort));
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookingDtoList.addAll(bookingRepository.findAllByItemOwnerAndStatusEquals(user, REJECTED, sort));
                 break;
             default:
-                throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
+                throw new BadRequestException("Unknown state: " + UNSUPPORTED_STATUS);
         }
 
         return bookingDtoList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
@@ -128,34 +130,34 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllByUser(Long userId, String state) {
+    public List<BookingDto> getAllByUser(Long userId, State state) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Невозможно найти бронирования - " +
                         "не найден пользователь с id " + userId));
         List<Booking> bookingDtoList = new ArrayList<>();
         switch (state) {
-            case "ALL":
-                bookingDtoList.addAll(bookingRepository.findAllByBooker(user,sort));
+            case ALL:
+                bookingDtoList.addAll(bookingRepository.findAllByBooker(user, sort));
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookingDtoList.addAll(bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user,
                         LocalDateTime.now(), LocalDateTime.now(), sort));
                 break;
-            case "PAST":
+            case PAST:
                 bookingDtoList.addAll(bookingRepository.findAllByBookerAndEndBefore(user,
                         LocalDateTime.now(), sort));
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookingDtoList.addAll(bookingRepository.findAllByBookerAndStartAfter(user, LocalDateTime.now(), sort));
                 break;
-            case "WAITING":
+            case WAITING:
                 bookingDtoList.addAll(bookingRepository.findAllByBookerAndStatusEquals(user, WAITING, sort));
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookingDtoList.addAll(bookingRepository.findAllByBookerAndStatusEquals(user, REJECTED, sort));
                 break;
             default:
-                throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
+                throw new BadRequestException("Unknown state: " + UNSUPPORTED_STATUS);
         }
 
         return bookingDtoList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
