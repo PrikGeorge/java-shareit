@@ -1,84 +1,77 @@
 package ru.practicum.shareit.user.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.DuplicateEmailException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDTO;
-import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepositoryImpl;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @project java-shareit
  * @auther George Prikashchenkov on 19.02.2023
  */
-@Slf4j
+
+import static ru.practicum.shareit.user.mapper.UserMapper.toEntity;
+import static ru.practicum.shareit.user.mapper.UserMapper.toDTO;
+
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepositoryImpl userRepositoryImpl;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepositoryImpl userRepositoryImpl) {
-        this.userRepositoryImpl = userRepositoryImpl;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public User getById(Long id) {
-        return userRepositoryImpl.getById(id)
-                .orElseThrow(() -> new NotFoundException("Не найден пользователь с id: " + id));
-    }
-
+    @Transactional(readOnly = true)
+    @Override
     public List<UserDTO> getAll() {
-        List<User> users = userRepositoryImpl.getAll();
-        List<UserDTO> result = new ArrayList<>();
-
-        if (users.isEmpty()) {
-            return result;
+        List<UserDTO> users = new ArrayList<>();
+        for (User user : userRepository.findAll()) {
+            users.add(toDTO(user));
         }
 
-        for (User userToDTO : users) {
-            result.add(UserMapper.toDTO(userToDTO));
-        }
-
-        return result;
+        return users;
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public UserDTO getById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Не найден пользователь с id: " + id));
+
+        return toDTO(user);
+    }
+
+    @Transactional
+    @Override
     public UserDTO create(UserDTO userDTO) {
-        User user = UserMapper.toEntity(userDTO);
-        validateEmailUniqueness(user.getEmail());
+        User user = toEntity(userDTO);
 
-        User createdUser = userRepositoryImpl.save(user);
-        return UserMapper.toDTO(createdUser);
+        return toDTO(userRepository.save(user));
     }
 
+    @Transactional
+    @Override
     public UserDTO update(Long id, UserDTO userDTO) {
-        User user = getById(id);
+        User updatedUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Невозможно обновить данные пользователя. " +
+                        "Не найден пользователь с id: " + id));
 
-        if (Objects.nonNull(userDTO.getEmail()) && !user.getEmail().equals(userDTO.getEmail())) {
-            validateEmailUniqueness(userDTO.getEmail());
-        }
+        Optional.ofNullable(userDTO.getEmail()).ifPresent(updatedUser::setEmail);
+        Optional.ofNullable(userDTO.getName()).ifPresent(updatedUser::setName);
 
-        user.setName(Objects.requireNonNullElse(userDTO.getName(), user.getName()));
-        user.setEmail(Objects.requireNonNullElse(userDTO.getEmail(), user.getEmail()));
-        User updatedUser = userRepositoryImpl.save(user);
-        return UserMapper.toDTO(updatedUser);
+        return toDTO(userRepository.save(updatedUser));
     }
 
+    @Transactional
+    @Override
     public void delete(Long id) {
-        userRepositoryImpl.delete(id);
-    }
-
-    private void validateEmailUniqueness(String email) {
-        List<User> users = userRepositoryImpl.getAll();
-        for (User user : users) {
-            if (email.equals(user.getEmail())) {
-                log.error("Пользователь с такой почтой " + email + " уже существует");
-                throw new DuplicateEmailException("Пользователь с такой почтой " + email + " уже существует");
-            }
-        }
+        userRepository.deleteById(id);
     }
 }
