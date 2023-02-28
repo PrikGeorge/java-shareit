@@ -78,8 +78,8 @@ class BookingControllerTests {
         ItemDTO item = itemController.create(user.getId(), itemDTO);
         UserDTO user1 = userController.create(userDTO1);
         BookingDto booking = bookingController.create(BookingShortDto.builder()
-                .start(LocalDateTime.of(2022, 10, 24, 12, 30))
-                .end(LocalDateTime.of(2022, 11, 10, 13, 0))
+                .start(LocalDateTime.of(2023, 2, 24, 12, 30))
+                .end(LocalDateTime.of(2023, 3, 10, 13, 0))
                 .itemId(item.getId()).build(), user1.getId());
         assertEquals(1, bookingController.getAllByUser(user1.getId(), "WAITING").size());
         bookingController.approve(booking.getId(), user.getId(), true);

@@ -3,13 +3,12 @@ package ru.practicum.shareit.booking.service;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -85,11 +84,8 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Невозможно подтвердить бронирование - " +
                     "бронирование уже подтверждено или отклонено");
         }
-        if (approved) {
-            booking.setStatus(APPROVED);
-        } else {
-            booking.setStatus(REJECTED);
-        }
+
+        booking.setStatus(approved ? APPROVED : REJECTED);
         bookingRepository.save(booking);
 
         return toBookingDto(booking);
