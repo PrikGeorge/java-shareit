@@ -4,8 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.dto.CommentDTO;
 import ru.practicum.shareit.item.dto.ItemDTO;
 import ru.practicum.shareit.item.mapper.CommentMapper;
@@ -20,6 +19,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -59,17 +59,21 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDTO> getAll(Long userId) {
         List<Item> items = itemRepository.findAllByOwnerId(userId);
         List<ItemDTO> itemDTOList = items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        List<Long> itemIds = itemDTOList.stream().map(ItemDTO::getId).collect(Collectors.toList());
+
+        List<Booking> lastBookings = bookingRepository.findAllByItemIdInAndStartBeforeOrderByItemIdAscStartAsc(itemIds, LocalDateTime.now());
+
+        Map<Long, List<Booking>> itemToBookingsMap = lastBookings.stream().collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
+
         itemDTOList.forEach(itemDto -> {
-            List<Booking> lastBooking = bookingRepository.findAllByItemIdAndStartBeforeOrderByStartAsc(itemDto.getId(), LocalDateTime.now());
-            itemDto.setLastBooking(lastBooking.isEmpty() ?
-                    null : toBookingShortDto(bookingRepository.findAllByItemIdAndStartBeforeOrderByStartAsc(itemDto.getId(), LocalDateTime.now()).get(0)));
-
-            if (itemDto.getLastBooking() != null) {
-                List<Booking> nextBooking = bookingRepository.findAllByItemIdAndStartAfterOrderByStartAsc(itemDto.getId(), itemDto.getLastBooking().getStart());
-                itemDto.setNextBooking(nextBooking.isEmpty() ?
-                        null : toBookingShortDto(nextBooking.get(0)));
+            List<Booking> bookings = itemToBookingsMap.get(itemDto.getId());
+            if (bookings != null && !bookings.isEmpty()) {
+                itemDto.setLastBooking(toBookingShortDto(bookings.get(0)));
+                List<Booking> nextBookings = bookingRepository.findAllByItemIdAndStartAfterOrderByStartAsc(itemDto.getId(), bookings.get(0).getStart());
+                if (!nextBookings.isEmpty()) {
+                    itemDto.setNextBooking(toBookingShortDto(nextBookings.get(0)));
+                }
             }
-
 
             itemDto.setComments(commentRepository.findAllByItemId(itemDto.getId()).stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
         });
@@ -87,16 +91,18 @@ public class ItemServiceImpl implements ItemService {
                 .stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
 
         if (item.getOwner().getId().equals(ownerId)) {
-            List<Booking> lastBooking = bookingRepository.findAllByItemIdAndStartBeforeOrderByStartAsc(id, LocalDateTime.now());
-            itemDto.setLastBooking(lastBooking.isEmpty() ? null :
-                    toBookingShortDto(bookingRepository.findAllByItemIdAndStartBeforeOrderByStartAsc(id, LocalDateTime.now()).get(0)));
+            List<Booking> lastBookings = bookingRepository.findAllByItemIdAndStartBeforeOrderByStartAsc(id, LocalDateTime.now());
+            if (!lastBookings.isEmpty()) {
+                Booking lastBooking = bookingRepository.findAllByItemIdAndStartBeforeOrderByStartAsc(id, LocalDateTime.now()).get(0);
+                itemDto.setLastBooking(toBookingShortDto(lastBooking));
+            }
 
             if (itemDto.getLastBooking() != null) {
                 List<Booking> nextBooking = bookingRepository.findAllByItemIdAndStartAfterOrderByStartAsc(itemDto.getId(), itemDto.getLastBooking().getStart());
-                itemDto.setNextBooking(nextBooking.isEmpty() ?
-                        null : toBookingShortDto(nextBooking.get(0)));
+                if (!nextBooking.isEmpty()) {
+                    itemDto.setNextBooking(toBookingShortDto(nextBooking.get(0)));
+                }
             }
-
         }
 
         return itemDto;
@@ -143,7 +149,9 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return searchedItems;
         }
-        for (Item item : itemRepository.findAll()) {
+
+        List<Item> items = itemRepository.findAll();
+        for (Item item : items) {
             if (isSearched(text, item)) {
                 searchedItems.add(toItemDto(item));
             }
