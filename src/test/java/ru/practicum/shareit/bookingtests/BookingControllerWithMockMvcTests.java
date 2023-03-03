@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.controller.BookingController;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDTO;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.BadRequestException;
@@ -46,7 +46,7 @@ class BookingControllerWithMockMvcTests {
 
     private ItemDTO itemDto;
 
-    private BookingDto bookingDto;
+    private BookingDTO bookingDto;
 
     @BeforeEach
     void init() {
@@ -65,7 +65,7 @@ class BookingControllerWithMockMvcTests {
                 .available(true)
                 .build();
 
-        bookingDto = BookingDto
+        bookingDto = BookingDTO
                 .builder()
                 .id(1L)
                 .start(LocalDateTime.of(2022, 12, 12, 10, 0))

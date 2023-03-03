@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.request.controller.ItemRequestController;
-import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDTO;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.nio.charset.StandardCharsets;
@@ -33,11 +33,11 @@ class ItemRequestControllerWithMockMvcTests {
     @Autowired
     private MockMvc mvc;
 
-    private ItemRequestDto itemRequestDto;
+    private ItemRequestDTO itemRequestDto;
 
     @BeforeEach
     void init() {
-        itemRequestDto = ItemRequestDto
+        itemRequestDto = ItemRequestDTO
                 .builder()
                 .id(1L)
                 .description("item request description")

@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.controller.BookingController;
-import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.booking.dto.BookingShortDTO;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.CommentDTO;
 import ru.practicum.shareit.item.dto.ItemDTO;
 import ru.practicum.shareit.request.controller.ItemRequestController;
-import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDTO;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDTO;
 
@@ -42,7 +42,7 @@ class ItemControllerTests {
 
     private UserDTO userDto;
 
-    private ItemRequestDto itemRequestDto;
+    private ItemRequestDTO itemRequestDto;
 
     private CommentDTO comment;
 
@@ -59,7 +59,7 @@ class ItemControllerTests {
                 .email("user@email.com")
                 .build();
 
-        itemRequestDto = ItemRequestDto
+        itemRequestDto = ItemRequestDTO
                 .builder()
                 .description("item request description")
                 .build();
@@ -80,7 +80,7 @@ class ItemControllerTests {
     @Test
     void createWithRequestTest() {
         UserDTO user = userController.create(userDto);
-        ItemRequestDto itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
+        ItemRequestDTO itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
         itemDto.setRequestId(1L);
         UserDTO user2 = userController.create(userDto.toBuilder().email("user2@email.com").build());
         ItemDTO item = itemController.create(2L, itemDto);
@@ -154,7 +154,7 @@ class ItemControllerTests {
         UserDTO user = userController.create(userDto);
         ItemDTO item = itemController.create(1L, itemDto);
         UserDTO user2 = userController.create(userDto.toBuilder().email("email2@mail.com").build());
-        bookingController.create(BookingShortDto.builder()
+        bookingController.create(BookingShortDTO.builder()
                 .start(LocalDateTime.of(2022, 10, 20, 12, 15))
                 .end(LocalDateTime.of(2022, 10, 27, 12, 15))
                 .itemId(item.getId()).build(), user2.getId());

@@ -8,7 +8,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.controller.ItemRequestController;
-import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDTO;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDTO;
 
@@ -24,13 +24,13 @@ class ItemRequestControllerTests {
     @Autowired
     private UserController userController;
 
-    private ItemRequestDto itemRequestDto;
+    private ItemRequestDTO itemRequestDto;
 
     private UserDTO userDto;
 
     @BeforeEach
     void init() {
-        itemRequestDto = ItemRequestDto
+        itemRequestDto = ItemRequestDTO
                 .builder()
                 .description("item request description")
                 .build();
@@ -45,7 +45,7 @@ class ItemRequestControllerTests {
     @Test
     void createTest() {
         UserDTO user = userController.create(userDto);
-        ItemRequestDto itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
+        ItemRequestDTO itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
         assertEquals(1L, itemRequestController.getById(itemRequest.getId(), user.getId()).getId());
     }
 
@@ -57,7 +57,7 @@ class ItemRequestControllerTests {
     @Test
     void getAllByUserTest() {
         UserDTO user = userController.create(userDto);
-        ItemRequestDto itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
+        ItemRequestDTO itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
         assertEquals(1, itemRequestController.getAllByUser(user.getId()).size());
     }
 
@@ -69,7 +69,7 @@ class ItemRequestControllerTests {
     @Test
     void getAll() {
         UserDTO user = userController.create(userDto);
-        ItemRequestDto itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
+        ItemRequestDTO itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
         assertEquals(0, itemRequestController.getAll(0, 10, user.getId()).size());
         UserDTO user2 = userController.create(userDto.toBuilder().email("user1@email.com").build());
         assertEquals(1, itemRequestController.getAll(0, 10, user2.getId()).size());

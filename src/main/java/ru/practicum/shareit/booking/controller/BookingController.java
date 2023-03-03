@@ -1,8 +1,8 @@
 package ru.practicum.shareit.booking.controller;
 
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.booking.dto.BookingDTO;
+import ru.practicum.shareit.booking.dto.BookingShortDTO;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.*;
@@ -22,19 +22,19 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingDto create(@Valid @RequestBody BookingShortDto bookingShortDto,
+    public BookingDTO create(@Valid @RequestBody BookingShortDTO bookingShortDto,
                              @RequestHeader(header) Long userId) {
         return bookingService.create(bookingShortDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto approve(@PathVariable Long bookingId, @RequestHeader(header) Long userId,
+    public BookingDTO approve(@PathVariable Long bookingId, @RequestHeader(header) Long userId,
                               @RequestParam Boolean approved) {
         return bookingService.approve(bookingId, userId, approved);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getAllByOwner(@RequestHeader(header) Long userId,
+    public List<BookingDTO> getAllByOwner(@RequestHeader(header) Long userId,
                                           @RequestParam(defaultValue = "ALL") State state,
                                           @RequestParam(defaultValue = "0") int from,
                                           @RequestParam(defaultValue = "10") int size) {
@@ -47,7 +47,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getAllByUser(@RequestHeader(header) Long userId,
+    public List<BookingDTO> getAllByUser(@RequestHeader(header) Long userId,
                                          @RequestParam(defaultValue = "ALL") State state,
                                          @RequestParam(defaultValue = "0") int from,
                                          @RequestParam(defaultValue = "10") int size) {
@@ -60,7 +60,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getById(@PathVariable Long bookingId, @RequestHeader(header) Long userId) {
+    public BookingDTO getById(@PathVariable Long bookingId, @RequestHeader(header) Long userId) {
         return bookingService.getById(bookingId, userId);
     }
 

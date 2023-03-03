@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class ItemRequestDto {
+public class ItemRequestDTO {
     private Long id;
 
     @NotBlank
