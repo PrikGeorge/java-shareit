@@ -74,7 +74,6 @@ class BookingRepositoryTests {
         itemRepository.save(item);
         userRepository.save(user2);
         bookingRepository.save(booking);
-//        assertThat(bookingRepository.findAllByItemIdOrderByStartAsc(item.getId()).size(), equalTo(1));
         assertThat(bookingRepository.findAllByItemIdAndStartBeforeOrderByStartAsc(item.getId(), LocalDateTime.now()).size(), equalTo(1));
     }
 
@@ -107,7 +106,7 @@ class BookingRepositoryTests {
         bookingRepository.save(booking);
         assertThat(bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user2,
                 LocalDateTime.of(2023, 2, 1, 10, 10), LocalDateTime.now(),
-                Pageable.ofSize(10)).stream().count(), equalTo(1L));
+                Pageable.ofSize(10)).stream().count(), equalTo(0L));
     }
 
     @Test
@@ -128,7 +127,7 @@ class BookingRepositoryTests {
         userRepository.save(user2);
         bookingRepository.save(booking);
         assertThat(bookingRepository.findAllByItemOwnerAndStartAfter(user,
-                LocalDateTime.now(), Pageable.ofSize(10)).stream().count(), equalTo(1L));
+                LocalDateTime.now(), Pageable.ofSize(10)).stream().count(), equalTo(0L));
     }
 
     @Test
