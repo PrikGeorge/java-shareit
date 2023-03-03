@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item.mapper;
 
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDTO;
 import ru.practicum.shareit.item.model.Item;
 
 /**
@@ -8,8 +8,8 @@ import ru.practicum.shareit.item.model.Item;
  * @auther George Prikashchenkov on 19.02.2023
  */
 public class ItemMapper {
-    public static ItemDto toItemDto(Item item) {
-        return ItemDto.builder()
+    public static ItemDTO toItemDto(Item item) {
+        return ItemDTO.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
@@ -18,7 +18,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public static Item toItem(ItemDto itemDto) {
+    public static Item toItem(ItemDTO itemDto) {
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())

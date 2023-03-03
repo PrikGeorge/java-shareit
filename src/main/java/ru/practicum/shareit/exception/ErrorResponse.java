@@ -2,14 +2,14 @@ package ru.practicum.shareit.exception;
 
 public class ErrorResponse {
     private int statusCode;
-    private String message;
+    private String error;
 
     public ErrorResponse() {
     }
 
-    public ErrorResponse(int statusCode, String message) {
+    public ErrorResponse(int statusCode, String error) {
         this.statusCode = statusCode;
-        this.message = message;
+        this.error = error;
     }
 
     public int getStatusCode() {
@@ -20,11 +20,11 @@ public class ErrorResponse {
         this.statusCode = statusCode;
     }
 
-    public String getMessage() {
-        return message;
+    public String getError() {
+        return error;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setError(String error) {
+        this.error = error;
     }
 }

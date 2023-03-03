@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.user.dto.UserDTO;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
@@ -10,9 +9,9 @@ import java.util.List;
  * @auther George Prikashchenkov on 19.02.2023
  */
 public interface UserService {
-    User getById(Long id);
-
     List<UserDTO> getAll();
+
+    UserDTO getById(Long id);
 
     UserDTO create(UserDTO userDTO);
 
