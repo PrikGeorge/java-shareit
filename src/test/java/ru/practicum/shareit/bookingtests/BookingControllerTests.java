@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.controller.BookingController;
-import ru.practicum.shareit.booking.dto.BookingDTO;
-import ru.practicum.shareit.booking.dto.BookingShortDTO;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -42,7 +42,7 @@ class BookingControllerTests {
 
     private UserDTO userDTO1;
 
-    private BookingShortDTO bookingShortDTO;
+    private BookingShortDto bookingShortDTO;
 
     @BeforeEach
     void init() {
@@ -62,7 +62,7 @@ class BookingControllerTests {
                 .email("user1@email.com")
                 .build();
 
-        bookingShortDTO = BookingShortDTO.builder()
+        bookingShortDTO = BookingShortDto.builder()
                 .start(LocalDateTime.of(2022, 10, 24, 12, 30))
                 .end(LocalDateTime.of(2023, 11, 10, 13, 0))
                 .itemId(1L).build();
@@ -73,7 +73,7 @@ class BookingControllerTests {
         UserDTO user = userController.create(userDTO);
         ItemDTO item = itemController.create(user.getId(), itemDTO);
         UserDTO user1 = userController.create(userDTO1);
-        BookingDTO booking = bookingController.create(bookingShortDTO, user1.getId());
+        BookingDto booking = bookingController.create(bookingShortDTO, user1.getId());
         assertEquals(1L, bookingController.getById(booking.getId(), user1.getId()).getId());
     }
 
@@ -118,7 +118,7 @@ class BookingControllerTests {
         UserDTO user = userController.create(userDTO);
         ItemDTO item = itemController.create(user.getId(), itemDTO);
         UserDTO user1 = userController.create(userDTO1);
-        BookingDTO booking = bookingController.create(BookingShortDTO.builder()
+        BookingDto booking = bookingController.create(BookingShortDto.builder()
                 .start(LocalDateTime.of(2022, 10, 24, 12, 30))
                 .end(LocalDateTime.of(2022, 11, 10, 13, 0))
                 .itemId(item.getId()).build(), user1.getId());
@@ -137,7 +137,7 @@ class BookingControllerTests {
         UserDTO user = userController.create(userDTO);
         ItemDTO item = itemController.create(user.getId(), itemDTO);
         UserDTO user1 = userController.create(userDTO1);
-        BookingDTO booking = bookingController.create(bookingShortDTO, user1.getId());
+        BookingDto booking = bookingController.create(bookingShortDTO, user1.getId());
         assertThrows(NotFoundException.class, () -> bookingController.approve(1L, 2L, true));
     }
 
@@ -146,7 +146,7 @@ class BookingControllerTests {
         UserDTO user = userController.create(userDTO);
         ItemDTO item = itemController.create(user.getId(), itemDTO);
         UserDTO user1 = userController.create(userDTO1);
-        BookingDTO booking = bookingController.create(bookingShortDTO, user1.getId());
+        BookingDto booking = bookingController.create(bookingShortDTO, user1.getId());
         bookingController.approve(1L, 1L, true);
         assertThrows(BadRequestException.class, () -> bookingController.approve(1L, 1L, true));
     }
@@ -156,7 +156,7 @@ class BookingControllerTests {
         UserDTO user = userController.create(userDTO);
         ItemDTO item = itemController.create(user.getId(), itemDTO);
         UserDTO user1 = userController.create(userDTO1);
-        BookingDTO booking = bookingController.create(bookingShortDTO, user1.getId());
+        BookingDto booking = bookingController.create(bookingShortDTO, user1.getId());
         assertEquals(1, bookingController.getAllByUser(user1.getId(), State.WAITING, 0, 10).size());
         assertEquals(1, bookingController.getAllByUser(user1.getId(), ALL, 0, 10).size());
         assertEquals(0, bookingController.getAllByUser(user1.getId(), PAST, 0, 10).size());
@@ -188,7 +188,7 @@ class BookingControllerTests {
         UserDTO user = userController.create(userDTO);
         ItemDTO item = itemController.create(user.getId(), itemDTO);
         UserDTO user1 = userController.create(userDTO1);
-        BookingDTO booking = bookingController.create(bookingShortDTO, user1.getId());
+        BookingDto booking = bookingController.create(bookingShortDTO, user1.getId());
         assertThrows(NotFoundException.class, () -> bookingController.getById(1L, 10L));
     }
 }

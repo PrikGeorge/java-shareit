@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.controller.BookingController;
-import ru.practicum.shareit.booking.dto.BookingShortDTO;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.controller.ItemController;
@@ -154,7 +154,7 @@ class ItemControllerTests {
         UserDTO user = userController.create(userDto);
         ItemDTO item = itemController.create(1L, itemDto);
         UserDTO user2 = userController.create(userDto.toBuilder().email("email2@mail.com").build());
-        bookingController.create(BookingShortDTO.builder()
+        bookingController.create(BookingShortDto.builder()
                 .start(LocalDateTime.of(2022, 10, 20, 12, 15))
                 .end(LocalDateTime.of(2022, 10, 27, 12, 15))
                 .itemId(item.getId()).build(), user2.getId());
