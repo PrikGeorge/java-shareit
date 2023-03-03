@@ -10,7 +10,7 @@ import java.util.List;
  * @auther George Prikashchenkov on 19.02.2023
  */
 public interface ItemService {
-    List<ItemDTO> getAll(Long userId);
+    List<ItemDTO> getAll(Long userId, int from, int size);
 
     ItemDTO getById(Long id, Long ownerId);
 
@@ -20,7 +20,7 @@ public interface ItemService {
 
     void delete(Long id);
 
-    List<ItemDTO> search(String text);
+    List<ItemDTO> search(String text, int from, int size);
 
     CommentDTO createComment(Long itemId, Long userId, CommentDTO commentDto);
 }

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDTO;
 import ru.practicum.shareit.item.dto.ItemDTO;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.exception.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -24,8 +25,15 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDTO> getAll(@RequestHeader(header) Long userId) {
-        return itemService.getAll(userId);
+    public List<ItemDTO> getAll(@RequestHeader(header) Long userId,
+                                @RequestParam(defaultValue = "0") int from,
+                                @RequestParam(defaultValue = "10") int size) {
+        if (from < 0 || size <= 0) {
+            throw new BadRequestException("Невозможно найти вещи - " +
+                    "неккоректно переданы параметры поиска - индекс первого элемента не может быть меньше нуля, " +
+                    "а размер страницы должен быть больше нуля");
+        }
+        return itemService.getAll(userId, from, size);
     }
 
     @GetMapping("/{id}")
@@ -50,8 +58,15 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDTO> search(@RequestParam String text) {
-        return itemService.search(text);
+    public List<ItemDTO> search(@RequestParam String text,
+                                @RequestParam(defaultValue = "0") int from,
+                                @RequestParam(defaultValue = "10") int size) {
+        if (from < 0 || size <= 0) {
+            throw new BadRequestException("Невозможно найти вещи - " +
+                    "неккоректно переданы параметры поиска - индекс первого элемента не может быть меньше нуля, " +
+                    "а размер страницы должен быть больше нуля");
+        }
+        return itemService.search(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
