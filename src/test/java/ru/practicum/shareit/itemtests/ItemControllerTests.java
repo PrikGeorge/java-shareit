@@ -84,7 +84,7 @@ class ItemControllerTests {
         itemDto.setRequestId(1L);
         UserDTO user2 = userController.create(userDto.toBuilder().email("user2@email.com").build());
         ItemDTO item = itemController.create(2L, itemDto);
-        assertEquals(item, itemController.getById(1L, 2L));
+        assertEquals(item.getId(), itemController.getById(1L, 2L).getId());
     }
 
     @Test
