@@ -150,7 +150,7 @@ class ItemControllerWithMockMvcTests {
     }
 
     @Test
-    void deleteItem_Success() throws Exception {
+    void deleteItemSuccess() throws Exception {
         Long itemId = 1L;
 
         doNothing().when(itemService).delete(itemId);
@@ -162,7 +162,7 @@ class ItemControllerWithMockMvcTests {
     }
 
     @Test
-    void deleteItem_NotFound() throws Exception {
+    void deleteItemNotFound() throws Exception {
         Long itemId = 1L;
 
         doThrow(new NotFoundException(Long.toString(itemId))).when(itemService).delete(itemId);
