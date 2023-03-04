@@ -70,7 +70,7 @@ class ItemControllerWithMockMvcTests {
     }
 
     @Test
-    public void testGetAllWithInvalidParams() throws Exception {
+    void testGetAllWithInvalidParams() throws Exception {
         when(itemService.getAll(1L, -1, 10)).thenThrow(new BadRequestException("Некорректные параметры"));
 
         mvc.perform(get("/items")

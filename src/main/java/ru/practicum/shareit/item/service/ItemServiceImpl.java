@@ -196,8 +196,4 @@ public class ItemServiceImpl implements ItemService {
         return toCommentDto(comment);
     }
 
-    private Boolean isSearched(String text, Item item) {
-        return item.getName().toLowerCase().contains(text.toLowerCase()) ||
-                item.getDescription().toLowerCase().contains(text.toLowerCase()) && item.getAvailable();
-    }
 }
