@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDTO;
+import ru.practicum.shareit.booking.dto.BookingShortDTO;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.BadRequestException;
@@ -22,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,6 +49,8 @@ class BookingControllerWithMockMvcTests {
     private ItemDTO itemDto;
 
     private BookingDTO bookingDto;
+
+    private BookingShortDTO bookingShortDto;
 
     @BeforeEach
     void init() {
@@ -74,6 +78,18 @@ class BookingControllerWithMockMvcTests {
                 .item(ItemMapper.toItem(itemDto))
                 .build();
 
+        bookingShortDto = BookingShortDTO.builder()
+                .start(LocalDateTime.of(2022, 10, 24, 12, 30))
+                .end(LocalDateTime.of(2023, 11, 10, 13, 0))
+                .itemId(1L).build();
+    }
+
+    @Test
+    void createTest() {
+        when(bookingService.create(bookingShortDto, 1L)).thenReturn(bookingDto);
+        BookingDTO actualBooking = bookingService.create(bookingShortDto, 1L);
+
+        assertEquals(bookingDto, actualBooking);
     }
 
     @Test
@@ -140,4 +156,5 @@ class BookingControllerWithMockMvcTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
 }

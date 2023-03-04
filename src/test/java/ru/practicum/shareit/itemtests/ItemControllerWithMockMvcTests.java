@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.CommentDTO;
 import ru.practicum.shareit.item.dto.ItemDTO;
@@ -17,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,6 +67,18 @@ class ItemControllerWithMockMvcTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(List.of(itemDto))));
+    }
+
+    @Test
+    public void testGetAllWithInvalidParams() throws Exception {
+        when(itemService.getAll(1L, -1, 10)).thenThrow(new BadRequestException("Некорректные параметры"));
+
+        mvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("from", "-1")
+                        .param("size", Integer.toString(10))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -134,4 +148,29 @@ class ItemControllerWithMockMvcTests {
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(commentDto)));
     }
+
+    @Test
+    void deleteItem_Success() throws Exception {
+        Long itemId = 1L;
+
+        doNothing().when(itemService).delete(itemId);
+
+        mvc.perform(delete("/items/{id}", itemId))
+                .andExpect(status().isOk());
+
+        verify(itemService, times(1)).delete(itemId);
+    }
+
+    @Test
+    void deleteItem_NotFound() throws Exception {
+        Long itemId = 1L;
+
+        doThrow(new NotFoundException(Long.toString(itemId))).when(itemService).delete(itemId);
+
+        mvc.perform(delete("/items/{id}", itemId))
+                .andExpect(status().isNotFound());
+
+        verify(itemService, times(1)).delete(itemId);
+    }
+
 }

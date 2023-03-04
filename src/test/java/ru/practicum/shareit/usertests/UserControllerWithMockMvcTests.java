@@ -15,9 +15,10 @@ import ru.practicum.shareit.user.service.UserService;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -85,6 +86,27 @@ class UserControllerWithMockMvcTests {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(userDto)));
+    }
+
+    @Test
+    void testUpdateUser() {
+        userDto.setName("John Doe");
+
+        when(userService.update(1L, userDto)).thenReturn(userDto);
+
+        UserDTO result = userService.update(1L, userDto);
+
+        assertEquals("John Doe", result.getName());
+        verify(userService, times(1)).update(1L, userDto);
+    }
+
+    @Test
+    void testDeleteUser() {
+        doNothing().when(userService).delete(1L);
+
+        userService.delete(1L);
+
+        verify(userService, times(1)).delete(1L);
     }
 
 }
