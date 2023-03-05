@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -13,6 +14,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -44,21 +47,28 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     public ItemServiceImpl(ItemRepository itemRepository,
                            UserRepository userRepository,
                            BookingRepository bookingRepository,
-                           CommentRepository commentRepository) {
+                           CommentRepository commentRepository,
+                           ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDTO> getAll(Long userId) {
-        List<Item> items = itemRepository.findAllByOwnerId(userId);
-        List<ItemDTO> itemDTOList = items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+    public List<ItemDTO> getAll(Long userId, int from, int size) {
+        List<ItemDTO> itemDTOList = itemRepository.findAllByOwnerId(userId, PageRequest.of(from, size))
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
+
         List<Long> itemIds = itemDTOList.stream().map(ItemDTO::getId).collect(Collectors.toList());
 
         List<Booking> lastBookings = bookingRepository.findAllByItemIdInAndStartBeforeOrderByItemIdAscStartAsc(itemIds, LocalDateTime.now());
@@ -116,6 +126,12 @@ public class ItemServiceImpl implements ItemService {
                         "не найден пользователь с id: " + userId));
         Item item = toItem(itemDto);
         item.setOwner(user);
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Невозможно создать вещь - " +
+                            "не найден запрос с id: " + itemDto.getRequestId()));
+            item.setRequest(itemRequest);
+        }
         itemRepository.save(item);
 
         return toItemDto(item);
@@ -144,18 +160,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDTO> search(String text) {
+    public List<ItemDTO> search(String text, int from, int size) {
         List<ItemDTO> searchedItems = new ArrayList<>();
         if (text.isBlank()) {
             return searchedItems;
         }
-
-        List<Item> items = itemRepository.findAll();
-        for (Item item : items) {
-            if (isSearched(text, item)) {
-                searchedItems.add(toItemDto(item));
-            }
-        }
+        searchedItems = itemRepository.search(text, PageRequest.of(from, size))
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
 
         return searchedItems;
     }
@@ -183,8 +196,4 @@ public class ItemServiceImpl implements ItemService {
         return toCommentDto(comment);
     }
 
-    private Boolean isSearched(String text, Item item) {
-        return item.getName().toLowerCase().contains(text.toLowerCase()) ||
-                item.getDescription().toLowerCase().contains(text.toLowerCase()) && item.getAvailable();
-    }
 }
