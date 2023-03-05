@@ -38,6 +38,8 @@ class UserControllerWithMockMvcTests {
 
     private UserDTO userDto;
 
+    private final String header = "X-Sharer-User-Id";
+
     @BeforeEach
     void init() {
         userDto = UserDTO
@@ -55,7 +57,7 @@ class UserControllerWithMockMvcTests {
         mvc.perform(get("/users")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(List.of(userDto))));
@@ -68,7 +70,7 @@ class UserControllerWithMockMvcTests {
         mvc.perform(get("/users/1")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(userDto)));
@@ -82,7 +84,7 @@ class UserControllerWithMockMvcTests {
                         .content(mapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(userDto)));

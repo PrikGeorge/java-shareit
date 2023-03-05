@@ -35,6 +35,8 @@ class ItemRequestControllerWithMockMvcTests {
 
     private ItemRequestDTO itemRequestDto;
 
+    private final String header = "X-Sharer-User-Id";
+
     @BeforeEach
     void init() {
         itemRequestDto = ItemRequestDTO
@@ -52,7 +54,7 @@ class ItemRequestControllerWithMockMvcTests {
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemRequestDto)));
@@ -65,7 +67,7 @@ class ItemRequestControllerWithMockMvcTests {
         mvc.perform(get("/requests")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(List.of(itemRequestDto))));
@@ -78,7 +80,7 @@ class ItemRequestControllerWithMockMvcTests {
         mvc.perform(get("/requests/all")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 2L)
+                        .header(header, 2L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(List.of(itemRequestDto))));
@@ -91,7 +93,7 @@ class ItemRequestControllerWithMockMvcTests {
         mvc.perform(get("/requests/1")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemRequestDto)));

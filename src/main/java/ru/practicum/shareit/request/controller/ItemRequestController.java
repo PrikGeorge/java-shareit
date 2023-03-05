@@ -16,21 +16,23 @@ public class ItemRequestController {
         this.itemRequestService = itemRequestService;
     }
 
+    private final String header = "X-Sharer-User-Id";
+
     @PostMapping
-    public ItemRequestDTO create(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemRequestDTO create(@RequestHeader(header) Long userId,
                                  @Valid @RequestBody ItemRequestDTO itemRequestDto) {
         return itemRequestService.create(userId, itemRequestDto);
     }
 
     @GetMapping
-    public List<ItemRequestDTO> getAllByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemRequestDTO> getAllByUser(@RequestHeader(header) Long userId) {
         return itemRequestService.getAllByUser(userId);
     }
 
     @GetMapping("/all")
     public List<ItemRequestDTO> getAll(@RequestParam(defaultValue = "0") int from,
                                        @RequestParam(defaultValue = "10") int size,
-                                       @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                       @RequestHeader(header) Long userId) {
         if (from < 0 || size <= 0) {
             throw new BadRequestException("Невозможно найти запросы - " +
                     "неккоректно переданы параметры поиска - индекс первого элемента не может быть меньше нуля, " +
@@ -40,7 +42,7 @@ public class ItemRequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestDTO getById(@PathVariable Long requestId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemRequestDTO getById(@PathVariable Long requestId, @RequestHeader(header) Long userId) {
         return itemRequestService.getById(requestId, userId);
     }
 }

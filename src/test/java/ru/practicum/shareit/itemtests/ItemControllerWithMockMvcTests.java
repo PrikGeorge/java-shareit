@@ -39,6 +39,8 @@ class ItemControllerWithMockMvcTests {
 
     private CommentDTO commentDto;
 
+    private final String header = "X-Sharer-User-Id";
+
     @BeforeEach
     void init() {
         itemDto = ItemDTO
@@ -63,7 +65,7 @@ class ItemControllerWithMockMvcTests {
         mvc.perform(get("/items")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(List.of(itemDto))));
@@ -74,7 +76,7 @@ class ItemControllerWithMockMvcTests {
         when(itemService.getAll(1L, -1, 10)).thenThrow(new BadRequestException("Некорректные параметры"));
 
         mvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .param("from", "-1")
                         .param("size", Integer.toString(10))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -88,7 +90,7 @@ class ItemControllerWithMockMvcTests {
         mvc.perform(get("/items/1")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemDto)));
@@ -102,7 +104,7 @@ class ItemControllerWithMockMvcTests {
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemDto)));
@@ -116,7 +118,7 @@ class ItemControllerWithMockMvcTests {
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemDto)));
@@ -129,7 +131,7 @@ class ItemControllerWithMockMvcTests {
         mvc.perform(get("/items/search?text='name'")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(List.of(itemDto))));
@@ -143,7 +145,7 @@ class ItemControllerWithMockMvcTests {
                         .content(mapper.writeValueAsString(commentDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(header, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(commentDto)));
