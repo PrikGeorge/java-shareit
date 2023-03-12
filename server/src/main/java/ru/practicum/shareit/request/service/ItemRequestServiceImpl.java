@@ -76,7 +76,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
 
-//        itemRequestDTOS.forEach(this::setItemsToItemRequestDto);
+        itemRequestDTOS.forEach(this::setItemsToItemRequestDto);
 
         return itemRequestDTOS;
     }
