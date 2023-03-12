@@ -20,21 +20,23 @@ import javax.validation.constraints.PositiveOrZero;
 public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
 
+    private final String header = "X-Sharer-User-Id";
+
     @PostMapping
-    public ResponseEntity<Object> createItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public Object createItemRequest(@RequestHeader(header) Long userId,
                                                     @Valid @RequestBody ItemRequestRequestDto requestDto) {
         log.info("Create item request by user {}", userId);
         return itemRequestClient.createItemRequest(userId, requestDto);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getItemRequestsByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Object getItemRequestsByUser(@RequestHeader(header) Long userId) {
         log.info("Get all user {} item requests", userId);
         return itemRequestClient.getItemRequestsByUser(userId);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") long userId,
+    public Object getAllItemRequests(@RequestHeader(header) long userId,
                                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                      @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Get all item requests without user {}", userId);
@@ -42,8 +44,8 @@ public class ItemRequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<Object> getItemRequest(@PathVariable Long requestId,
-                                                 @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public Object getItemRequest(@PathVariable Long requestId,
+                                                 @RequestHeader(header) Long userId) {
         log.info("Get item request {}", requestId);
         return itemRequestClient.getItemRequest(requestId, userId);
     }

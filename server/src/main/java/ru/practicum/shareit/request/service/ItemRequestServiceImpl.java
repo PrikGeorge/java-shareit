@@ -52,9 +52,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public List<ItemRequestDTO> getAllByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Невозможно найти запросы пользователя - " +
-                        "не найден пользователь с id " + userId));
         List<ItemRequestDTO> itemRequestDTOS = itemRequestRepository.findAllByRequestorIdOrderByCreatedAsc(userId)
                 .stream()
                 .map(ItemRequestMapper::toItemRequestDto)
@@ -70,11 +67,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Невозможно найти запросы - " +
                         "не найден пользователь с id " + userId));
-        List<ItemRequestDTO> itemRequestDTOS = itemRequestRepository.findAllByRequestorNotLikeOrderByCreatedAsc(user,
+        List<ItemRequestDTO> itemRequestDTOS = itemRequestRepository.findAllByRequestorOrderByCreatedAsc(user,
                         PageRequest.of(from, size))
                 .stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
+
         itemRequestDTOS.forEach(this::setItemsToItemRequestDto);
 
         return itemRequestDTOS;
@@ -83,9 +81,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public ItemRequestDTO getById(Long requestId, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Невозможно найти запрос - " +
-                        "не найден пользователь с id " + userId));
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Невозможно найти запрос - " +
                         "не существует запроса с id " + requestId));

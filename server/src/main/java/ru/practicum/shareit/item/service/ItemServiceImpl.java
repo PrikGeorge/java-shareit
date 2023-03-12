@@ -65,7 +65,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public List<ItemDTO> getAll(Long userId, int from, int size) {
-        List<ItemDTO> itemDTOList = itemRepository.findAllByOwnerId(userId, PageRequest.of(from, size))
+        List<ItemDTO> itemDTOList = itemRepository.findAllByOwnerIdAndRequestIsNullOrderByIdAsc(userId, PageRequest.of(from, size))
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());

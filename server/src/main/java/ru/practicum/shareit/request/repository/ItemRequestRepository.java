@@ -11,5 +11,5 @@ import java.util.List;
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> {
     List<ItemRequest> findAllByRequestorIdOrderByCreatedAsc(Long userId);
 
-    Page<ItemRequest> findAllByRequestorNotLikeOrderByCreatedAsc(User user, Pageable pageable);
+    Page<ItemRequest> findAllByRequestorOrderByCreatedAsc(User user, Pageable pageable);
 }
