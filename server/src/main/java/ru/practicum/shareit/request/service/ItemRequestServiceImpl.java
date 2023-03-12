@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.service;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -105,6 +104,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .map(ItemMapper::toItemShortDto)
                 .collect(Collectors.toList()));
     }
+
     private void setItemsToItemRequestDto(ItemRequestDTO itemRequestDto, Long userId) {
         itemRequestDto.setItems(itemRepository.findAllByOwnerIdAndRequestIdNotNull(itemRequestDto.getId())
                 .stream()
