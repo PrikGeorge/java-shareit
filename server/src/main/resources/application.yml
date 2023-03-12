@@ -15,8 +15,8 @@ spring:
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/shareit
-    username: postgres
-    password: 665566
+    username: root
+    password: root
 
 #  config:
 #    activate:
